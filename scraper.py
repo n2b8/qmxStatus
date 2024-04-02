@@ -28,29 +28,36 @@ def fetch_most_recent_row():
 
 def update_or_insert_position(position):
     current_datetime = get_current_datetime()
-    most_recent_position, most_recent_datetime_str = fetch_most_recent_row()
+    current_date_str = current_datetime.strftime('%Y-%m-%d')
 
     try:
         conn = sqlite3.connect(database_file_path)
         c = conn.cursor()
 
-        current_datetime_str = current_datetime.strftime('%Y-%m-%d %H:%M:%S')
+        # Check if an entry exists for this date regardless of the position
+        c.execute("SELECT COUNT(*) FROM order_tracking WHERE date(date_checked) = ?", (current_date_str,))
+        count = c.fetchone()[0]
 
-        if most_recent_datetime_str:
-            most_recent_datetime = datetime.strptime(most_recent_datetime_str, '%Y-%m-%d %H:%M:%S')
-
-            if most_recent_datetime.date() == current_datetime.date():
-                # Update the row if the date is the same but the position has changed
-                c.execute("UPDATE order_tracking SET position = ?, date_checked = ? WHERE date_checked = ?", (position, current_datetime_str, most_recent_datetime_str))
-            else:
-                # Insert a new row if the date has changed
-                c.execute("INSERT INTO order_tracking (position, date_checked) VALUES (?, ?)", (position, current_datetime_str))
-        else:
-            # If the table is empty, insert the first row
+        if count == 0:
+            # No entry for this date, so insert a new row
+            current_datetime_str = current_datetime.strftime('%Y-%m-%d %H:%M:%S')
             c.execute("INSERT INTO order_tracking (position, date_checked) VALUES (?, ?)", (position, current_datetime_str))
+        else:
+            # An entry for this date exists, check if the position is the same
+            c.execute("SELECT position FROM order_tracking WHERE date(date_checked) = ?", (current_date_str,))
+            existing_position = c.fetchone()[0]
+            if existing_position != position:
+                # The position for today has changed, update the row
+                current_datetime_str = current_datetime.strftime('%Y-%m-%d %H:%M:%S')
+                c.execute("UPDATE order_tracking SET position = ?, date_checked = ? WHERE date(date_checked) = ?", (position, current_datetime_str, current_date_str))
+            else:
+                # The position for today is the same, do nothing or log this information
+                print("The position for today has not changed.")
+
         conn.commit()
     finally:
         conn.close()
+
 
 def fetch_order_position(order_number):
     url = "https://qrp-labs.com/qcxmini/assembled.html"
@@ -97,11 +104,6 @@ def update_prediction(database_path):
             print("Prediction not feasible with current data.")
             predict_complete = "Unable to compute yet"
         else:
-            # Debugging
-            print("Model Coefficient:", model.coef_)
-            print("Model Intercept:", model.intercept_)
-            print("Zero Position Day:", zero_position_day)
-
             # Calculate the predicted completion date
             start_date = datetime.strptime(data[0][1], '%Y-%m-%d %H:%M:%S')
             predict_date = start_date + timedelta(days=zero_position_day)
