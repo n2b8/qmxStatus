@@ -10,9 +10,12 @@ I recently ordered a QMX 5w multi-band/multi-mode transceiver from QRP-Labs. Due
 - **Data Visualization:** Displays the order position history on a line graph.
 - **Automatic Updates:** Uses cron jobs to periodically update the order position.
 
-## Coming Soon
+## Testing
 
 - **Forecasting:** Once I have a few datapoints to work with, I'll implement a regressor to attempt to predict when my unit will be completed.
+
+## Coming Soon
+
 - **Notifications:** I may implement Twilio to send me an SMS notification when my position in line changes. Not positive I'll do that yet.
 
 ## Getting Started

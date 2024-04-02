@@ -18,6 +18,13 @@
     <p>Position has not changed or this is the first entry.</p>
     {% endif %}
 
+    <!-- Display the predicted completion date -->
+    {% if predict_complete %}
+    <p>Predicted Completion Date: <strong>{{ predict_complete }}</strong></p>
+    {% else %}
+    <p>Unable to compute the predicted completion date yet.</p>
+    {% endif %}
+
     <!-- Chart for displaying position history -->
     <div>
         <canvas id="positionHistoryChart"></canvas>
@@ -66,6 +73,5 @@
             }
         });
     </script>
-    <h2>Coming Soon: Completion Date Forecasting</h2>
 </body>
 </html>
