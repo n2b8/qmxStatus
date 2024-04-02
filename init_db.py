@@ -8,7 +8,8 @@ def create_database():
     c.execute('''CREATE TABLE IF NOT EXISTS order_tracking (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     position INTEGER NOT NULL,
-    date_checked TEXT NOT NULL)''')
+    date_checked TEXT NOT NULL,
+    predict_complete TEXT)''')
 
     # Save the changes
     conn.commit()
