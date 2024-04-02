@@ -4,7 +4,7 @@
 set -e
 
 # Define variables
-PROJECT_DIR="/qmxStatus"
+PROJECT_DIR="qmxStatus"
 PROJECT_USER="qmxUser"
 SERVICE_NAME="qmxStatus.service"
 APP_MODULE="app:app" # Replace 'your_flask_app:app' with your actual app module and Flask instance
@@ -35,6 +35,9 @@ source venv/bin/activate
 # Upgrade pip and install dependencies
 pip install --upgrade pip
 pip install gunicorn flask requests beautifulsoup4
+
+# Initialize the database by running init_db.py
+python $PROJECT_DIR/init_db.py
 
 # Deactivate the virtual environment
 deactivate
