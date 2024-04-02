@@ -41,7 +41,7 @@ source venv/bin/activate
 
 # Upgrade pip and install dependencies
 pip install --upgrade pip
-pip install gunicorn flask requests beautifulsoup4 numpy scipy sklearn
+pip install gunicorn flask requests beautifulsoup4 numpy scipy scikit-learn
 
 # Initialize the database by running init_db.py
 python $NEW_PROJECT_DIR/init_db.py
