@@ -4,7 +4,7 @@
 set -e
 
 # Define variables
-PROJECT_DIR="qmxStatus"
+PROJECT_DIR="/root/qmxStatus"
 PROJECT_USER="qmxUser"
 SERVICE_NAME="qmxStatus.service"
 APP_MODULE="app:app" # Replace 'your_flask_app:app' with your actual app module and Flask instance
