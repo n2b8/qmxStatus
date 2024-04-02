@@ -26,6 +26,7 @@ I recently ordered a QMX 5w multi-band/multi-mode transceiver from QRP-Labs. Due
 - BeautifulSoup4
 
 ### Installation
+**Be sure to install as root. Don't worry, the install script will create a new user and move into that user's profile before continuing.**
 
 1. **Clone the repository** to your local machine.
     ```bash

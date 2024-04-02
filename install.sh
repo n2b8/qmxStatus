@@ -7,9 +7,12 @@ set -e
 OLD_PROJECT_DIR="/root/qmxStatus"
 NEW_PROJECT_DIR="/opt/qmxStatus"
 PROJECT_USER="qmxUser"
-SERVICE_NAME="qmxStatus.service"
+SERVICE_NAME="qmxStatus"
 APP_MODULE="app:app" # Replace 'app:app' with your actual app module and Flask instance
 CRON_JOB="@hourly cd $NEW_PROJECT_DIR && $NEW_PROJECT_DIR/venv/bin/python $NEW_PROJECT_DIR/scraper.py"
+
+# Automatically retrieve the server's public IP address
+SERVER_IP=$(curl -s http://checkip.amazonaws.com)
 
 # Ensure running as root
 if [ "$(id -u)" != "0" ]; then
@@ -43,14 +46,11 @@ pip install gunicorn flask requests beautifulsoup4
 # Initialize the database by running init_db.py
 python $NEW_PROJECT_DIR/init_db.py
 
-# Run the scraper script immediately after installation
-python $NEW_PROJECT_DIR/scraper.py
-
 # Deactivate the virtual environment
 deactivate
 
-# Create a systemd service file
-SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME"
+# Create a systemd service file for Gunicorn
+SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
 echo "[Unit]
 Description=Gunicorn instance to serve my Flask app
 After=network.target
@@ -59,15 +59,15 @@ After=network.target
 User=$PROJECT_USER
 Group=$PROJECT_USER
 WorkingDirectory=$NEW_PROJECT_DIR
-ExecStart=$NEW_PROJECT_DIR/venv/bin/gunicorn --workers 3 --bind unix:$NEW_PROJECT_DIR/qmxStatus.sock $APP_MODULE
+ExecStart=$NEW_PROJECT_DIR/venv/bin/gunicorn --workers 3 --bind unix:$NEW_PROJECT_DIR/$SERVICE_NAME.sock $APP_MODULE
 
 [Install]
 WantedBy=multi-user.target" > $SERVICE_FILE
 
 # Reload systemd to apply new service file, enable and start the service
 systemctl daemon-reload
-systemctl enable $SERVICE_NAME
-systemctl start $SERVICE_NAME
+systemctl enable $SERVICE_NAME.service
+systemctl start $SERVICE_NAME.service
 
 # Setup Nginx as a reverse proxy
 apt update
@@ -75,17 +75,22 @@ apt install nginx -y
 NGINX_CONF="/etc/nginx/sites-available/$SERVICE_NAME"
 echo "server {
     listen 80;
-    server_name _;
+    server_name $SERVER_IP;
 
     location / {
-        proxy_pass http://unix:$NEW_PROJECT_DIR/qmxStatus.sock;
+        proxy_pass http://unix:$NEW_PROJECT_DIR/$SERVICE_NAME.sock;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
 }" > $NGINX_CONF
+
+# Ensure no faulty symlink exists and create a correct symlink
+rm -f /etc/nginx/sites-enabled/$SERVICE_NAME
 ln -s $NGINX_CONF /etc/nginx/sites-enabled/
-nginx -t && systemctl restart nginx
+
+# Test Nginx configuration and reload if successful
+nginx -t && systemctl reload nginx
 
 # Setup UFW firewall
 ufw allow 80
