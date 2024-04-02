@@ -97,6 +97,11 @@ def update_prediction(database_path):
             print("Prediction not feasible with current data.")
             predict_complete = "Unable to compute yet"
         else:
+            # Debugging
+            print("Model Coefficient:", model.coef_)
+            print("Model Intercept:", model.intercept_)
+            print("Zero Position Day:", zero_position_day)
+
             # Calculate the predicted completion date
             start_date = datetime.strptime(data[0][1], '%Y-%m-%d %H:%M:%S')
             predict_date = start_date + timedelta(days=zero_position_day)
