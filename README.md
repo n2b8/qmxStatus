@@ -24,11 +24,11 @@ This Flask application tracks and displays the position of an order over time. I
 
 1. **Clone the repository** to your local machine.
     ```bash
-    git clone <repository-url>
+    git clone https://github.com/n2b8/qmxStatus.git
     ```
 2. **Navigate to the project directory** and create a virtual environment:
     ```bash
-    cd <project-directory>
+    cd qmxStatus
     python3 -m venv venv
     ```
 3. **Activate the virtual environment:**
@@ -73,7 +73,7 @@ This Flask application tracks and displays the position of an order over time. I
     Create a systemd service file for your Flask application:
 
     ```bash
-    sudo nano /etc/systemd/system/yourapp.service
+    sudo nano /etc/systemd/system/qmxStatus.service
     ```
 
     Add the following configuration, adjusting paths and user information as necessary:
