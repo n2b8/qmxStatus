@@ -8,7 +8,7 @@ OLD_PROJECT_DIR="/root/qmxStatus"
 NEW_PROJECT_DIR="/opt/qmxStatus"
 PROJECT_USER="qmxUser"
 SERVICE_NAME="qmxStatus"
-APP_MODULE="app:app" # Replace 'app:app' with your actual app module and Flask instance
+APP_MODULE="app:app"
 CRON_JOB="@hourly cd $NEW_PROJECT_DIR && $NEW_PROJECT_DIR/venv/bin/python $NEW_PROJECT_DIR/scraper.py"
 
 # Automatically retrieve the server's public IP address
@@ -45,6 +45,9 @@ pip install gunicorn flask requests beautifulsoup4
 
 # Initialize the database by running init_db.py
 python $NEW_PROJECT_DIR/init_db.py
+
+# Run the scraper script immediately after installation
+python $NEW_PROJECT_DIR/scraper.py
 
 # Deactivate the virtual environment
 deactivate

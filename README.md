@@ -2,7 +2,7 @@
 
 ## Overview
 
-I recently ordered a QMX 5w multi-band/multi-mode transceiver from QRP-Labs. Due to life, I didn't have time to asseble the unit myself so I ordered the factory assembled kit along with a GPS module/board that is currently out of stock. To my understanding, the wait time is in the realm of 6-8 months. The backend of this program will scrape QRP-Labs' shipping status page watching for my order and updating the position in line into a SQLite3 database. The front end is a Flask application which tracks and displays the position of an order over time. The application updates the position data hourly using a scheduled script.
+I recently ordered a QMX 5w multi-band/multi-mode transceiver from QRP-Labs. Due to life, I didn't have time to assemble the unit myself so I ordered the factory assembled kit along with a GPS module/board that is currently out of stock. To my understanding, the wait time is in the realm of 6-8 months. The backend of this program will scrape QRP-Labs' shipping status page watching for my order and updating the position in line into a SQLite3 database. The front end is a Flask application which tracks and displays the position of an order over time. The application updates the position data hourly using a scheduled script.
 
 ## Features
 
