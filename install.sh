@@ -8,7 +8,7 @@ OLD_PROJECT_DIR="/root/qmxStatus"
 NEW_PROJECT_DIR="/opt/qmxStatus"
 PROJECT_USER="qmxUser"
 SERVICE_NAME="qmxStatus.service"
-APP_MODULE="app:app" # Replace 'your_flask_app:app' with your actual app module and Flask instance
+APP_MODULE="app:app" # Replace 'app:app' with your actual app module and Flask instance
 CRON_JOB="@hourly cd $NEW_PROJECT_DIR && $NEW_PROJECT_DIR/venv/bin/python $NEW_PROJECT_DIR/scraper.py"
 
 # Ensure running as root
@@ -42,6 +42,9 @@ pip install gunicorn flask requests beautifulsoup4
 
 # Initialize the database by running init_db.py
 python $NEW_PROJECT_DIR/init_db.py
+
+# Run the scraper script immediately after installation
+python $NEW_PROJECT_DIR/scraper.py
 
 # Deactivate the virtual environment
 deactivate
@@ -83,6 +86,10 @@ echo "server {
 }" > $NGINX_CONF
 ln -s $NGINX_CONF /etc/nginx/sites-enabled/
 nginx -t && systemctl restart nginx
+
+# Setup UFW firewall
+ufw allow 80
+ufw --force enable
 
 # Setup cron job
 (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
