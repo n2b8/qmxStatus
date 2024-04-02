@@ -43,22 +43,28 @@ def get_time_since_last_position_change(current_position):
 
 @app.route('/')
 def home():
-    current_position, _ = get_latest_position()  # Assuming get_latest_position still fetches the latest position and timestamp
+    current_position, _ = get_latest_position()  # Fetches the latest position and timestamp
 
     hours_since_change = None
     if current_position is not None:
         hours_since_change = get_time_since_last_position_change(current_position)
 
-    # Fetch all dates and positions for the graph as before
+    # Fetch all dates and positions for the graph
     conn = sqlite3.connect('order_tracking.db')
     c = conn.cursor()
     c.execute("SELECT date_checked, position FROM order_tracking ORDER BY date_checked")
     data = c.fetchall()
     all_dates = [row[0] for row in data]
     all_positions = [row[1] for row in data]
+
+    # Fetch the predicted completion date
+    c.execute("SELECT predict_complete FROM order_tracking ORDER BY id DESC LIMIT 1")
+    prediction_row = c.fetchone()
+    predict_complete = prediction_row[0] if prediction_row else "Prediction not available"
+
     conn.close()
 
-    return render_template('index.html', position=current_position, all_dates=all_dates, all_positions=all_positions, hours_since_checked=hours_since_change)
+    return render_template('index.html', position=current_position, all_dates=all_dates, all_positions=all_positions, hours_since_checked=hours_since_change, predict_complete=predict_complete)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
