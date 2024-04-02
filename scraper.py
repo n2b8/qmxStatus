@@ -7,7 +7,7 @@ import sqlite3
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-database_file_path = 'order_tracking.db'
+database_file_path = '/opt/qmxStatus/order_tracking.db'
 
 def get_current_datetime():
     # Returns current datetime as a datetime object
@@ -15,7 +15,7 @@ def get_current_datetime():
 
 def fetch_most_recent_row():
     try:
-        conn = sqlite3.connect('order_tracking.db')
+        conn = sqlite3.connect(database_file_path)
         c = conn.cursor()
         c.execute("SELECT position, date_checked FROM order_tracking ORDER BY id DESC LIMIT 1")
         row = c.fetchone()
@@ -31,7 +31,7 @@ def update_or_insert_position(position):
     most_recent_position, most_recent_datetime_str = fetch_most_recent_row()
 
     try:
-        conn = sqlite3.connect('order_tracking.db')
+        conn = sqlite3.connect(database_file_path)
         c = conn.cursor()
 
         current_datetime_str = current_datetime.strftime('%Y-%m-%d %H:%M:%S')

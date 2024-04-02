@@ -17,6 +17,7 @@ I recently ordered a QMX 5w multi-band/multi-mode transceiver from QRP-Labs. Due
 ## Coming Soon
 
 - **Notifications:** I may implement Twilio to send me an SMS notification when my position in line changes. Not positive I'll do that yet.
+- **Install Script:** Update install.sh to accept custom order number and display name
 
 ## Getting Started
 
