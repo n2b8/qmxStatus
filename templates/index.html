@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QMX Order Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>KF0BDW's QMX Order Position Tracker</h1>
+
+    <!-- Display the latest position -->
+    <p>Latest Position: <strong>{{ position }}</strong></p>
+
+    <!-- Display the time since the last position change -->
+    {% if hours_since_checked is not none %}
+    <p>Time Since Last Position Change: <strong>{{ hours_since_checked }} hours</strong></p>
+    {% else %}
+    <p>Position has not changed or this is the first entry.</p>
+    {% endif %}
+
+    <!-- Chart for displaying position history -->
+    <div>
+        <canvas id="positionHistoryChart"></canvas>
+    </div>
+
+    <script>
+        var ctx = document.getElementById('positionHistoryChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ all_dates | tojson }},
+                datasets: [{
+                    label: 'Position Over Time',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    data: {{ all_positions | tojson }},
+                }]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            parser: 'YYYY-MM-DD HH:mm:ss',
+                            tooltipFormat: 'll HH:mm'
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Date'
+                        },
+                        ticks: {
+                            maxRotation: 90, // Rotate the labels to 90 degrees
+                            minRotation: 90  // Keep them at 90 degrees
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Position'
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
+    <h2>Coming Soon: Completion Date Forecasting</h2>
+</body>
+</html>
