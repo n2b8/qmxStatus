@@ -99,7 +99,8 @@ nginx -t && systemctl reload nginx
 ufw allow 80
 ufw --force enable
 
-# Setup cron job
-(crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
+# Setup cron job for qmxUser
+CRON_JOB="@hourly cd $NEW_PROJECT_DIR && $NEW_PROJECT_DIR/venv/bin/python $NEW_PROJECT_DIR/scraper.py >> $NEW_PROJECT_DIR/cron.log 2>&1"
+(crontab -u $PROJECT_USER -l 2>/dev/null; echo "$CRON_JOB") | crontab -u $PROJECT_USER -
 
 echo "Installation completed successfully."
