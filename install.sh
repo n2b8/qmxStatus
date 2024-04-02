@@ -4,11 +4,12 @@
 set -e
 
 # Define variables
-PROJECT_DIR="/root/qmxStatus"
+OLD_PROJECT_DIR="/root/qmxStatus"
+NEW_PROJECT_DIR="/opt/qmxStatus"
 PROJECT_USER="qmxUser"
 SERVICE_NAME="qmxStatus.service"
 APP_MODULE="app:app" # Replace 'your_flask_app:app' with your actual app module and Flask instance
-CRON_JOB="@hourly cd $PROJECT_DIR && $PROJECT_DIR/venv/bin/python $PROJECT_DIR/scraper.py"
+CRON_JOB="@hourly cd $NEW_PROJECT_DIR && $NEW_PROJECT_DIR/venv/bin/python $NEW_PROJECT_DIR/scraper.py"
 
 # Ensure running as root
 if [ "$(id -u)" != "0" ]; then
@@ -22,11 +23,14 @@ pip install virtualenv
 # Create a new system user for the application (without home directory)
 useradd --system --no-create-home $PROJECT_USER || true
 
-# Change ownership of the project directory
-chown -R $PROJECT_USER:$PROJECT_USER $PROJECT_DIR
+# Move the project directory
+mv $OLD_PROJECT_DIR $NEW_PROJECT_DIR
 
-# Navigate to the project directory
-cd $PROJECT_DIR
+# Change ownership of the new project directory
+chown -R $PROJECT_USER:$PROJECT_USER $NEW_PROJECT_DIR
+
+# Navigate to the new project directory
+cd $NEW_PROJECT_DIR
 
 # Create a Python virtual environment using virtualenv and activate it
 virtualenv venv
@@ -37,7 +41,7 @@ pip install --upgrade pip
 pip install gunicorn flask requests beautifulsoup4
 
 # Initialize the database by running init_db.py
-python $PROJECT_DIR/init_db.py
+python $NEW_PROJECT_DIR/init_db.py
 
 # Deactivate the virtual environment
 deactivate
@@ -51,8 +55,8 @@ After=network.target
 [Service]
 User=$PROJECT_USER
 Group=$PROJECT_USER
-WorkingDirectory=$PROJECT_DIR
-ExecStart=$PROJECT_DIR/venv/bin/gunicorn --workers 3 --bind unix:$PROJECT_DIR/qmxStatus.sock $APP_MODULE
+WorkingDirectory=$NEW_PROJECT_DIR
+ExecStart=$NEW_PROJECT_DIR/venv/bin/gunicorn --workers 3 --bind unix:$NEW_PROJECT_DIR/qmxStatus.sock $APP_MODULE
 
 [Install]
 WantedBy=multi-user.target" > $SERVICE_FILE
@@ -71,7 +75,7 @@ echo "server {
     server_name _;
 
     location / {
-        proxy_pass http://unix:$PROJECT_DIR/qmxStatus.sock;
+        proxy_pass http://unix:$NEW_PROJECT_DIR/qmxStatus.sock;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
