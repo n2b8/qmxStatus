@@ -1,21 +1,8 @@
-from flask import Flask, render_template, Response, make_response
+from flask import Flask, render_template
 import sqlite3
 from datetime import datetime
-from functools import wraps
 
 app = Flask(__name__)
-
-def set_csp_header(csp_value):
-    def decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            resp = make_response(f(*args, **kwargs))
-            resp.headers['Content-Security-Policy'] = csp_value
-            return resp
-        return decorated_function
-    return decorator
-
-csp_policy = "frame-ancestors 'self' http://jakemccaig.com, https://www.qrz.com/"
 
 def get_latest_position():
     '''Fetch the latest position and the timestamp from the database.'''
@@ -55,7 +42,6 @@ def get_time_since_last_position_change(current_position):
     return None
 
 @app.route('/')
-@set_csp_header(csp_policy)
 def home():
     current_position, _ = get_latest_position()  # Fetches the latest position and timestamp
 
